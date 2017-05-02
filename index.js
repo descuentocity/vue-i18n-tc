@@ -1,5 +1,5 @@
 /* eslint-disable global-require, import/no-dynamic-require, no-underscore-dangle */
-export function getLocale(locales, key = '') {
+function getLocale(locales, key = '') {
   const locale = locales[key];
   if (locale) {
     return locale;
@@ -7,7 +7,7 @@ export function getLocale(locales, key = '') {
   return key;
 }
 
-export function interpolateObject(key, params) {
+function interpolateObject(key, params) {
   let str = key;
   key.match(/\{[\w]+\}/g).forEach((param) => {
     const interpolateKey = param.replace(/\{?\}?/g, '');
@@ -17,11 +17,11 @@ export function interpolateObject(key, params) {
   return str;
 }
 
-export function interpolateArray(key, params = []) {
+function interpolateArray(key, params = []) {
   return params.map(param => key.replace(/\?/, param));
 }
 
-export function pluralization(locale, qty) {
+function pluralization(locale, qty) {
   const local = locale.split('|');
   if (qty > 1 && local[1]) {
     return local[1];
@@ -35,7 +35,7 @@ export function pluralization(locale, qty) {
 // __('interpolation and pluralization {args1} {args2}', {arg1: 1, arg2: 2}, 3);
 // __('array interpolation ?, ?', [1, 2]);
 // __('array interpolation and pluralization ? ?', [1, 2], 3);
-export function __(locales, key, params, qty) {
+function __(locales, key, params, qty) {
   try {
     let locale = getLocale(locales, key);
     if (qty) {
@@ -70,15 +70,21 @@ const localesPaths = {
   'pt-BR': cb => require(['json-loader!./locales/pt-BR.json'], cb),
 };
 
-
 class LocalesLoader {
-  constructor(lang) {
+  constructor(lang, SSR) {
     this.locales = undefined;
     this.observers = [];
-    localesPaths[lang]((json) => {
+    if (SSR) {
+      console.log('ssr');
+      const json = require(`./locales/${lang}.json`);
       this.locales = json;
       this.observers.map(observer => observer(json));
-    });
+    } else {
+      localesPaths[lang]((json) => {
+        this.locales = json;
+        this.observers.map(observer => observer(json));
+      });
+    }
   }
   subscribe(observer) {
     if (this.locales) {
@@ -89,9 +95,9 @@ class LocalesLoader {
   }
 }
 
-export default {
-  install: (Vue, { lang } = {}) => {
-    const localesLoader = new LocalesLoader(lang);
+module.exports = {
+  install: (Vue, { lang, SSR } = {}) => {
+    const localesLoader = new LocalesLoader(lang, SSR);
     Vue.mixin({
       data: () => ({
         lang,
