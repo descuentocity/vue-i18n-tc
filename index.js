@@ -74,13 +74,13 @@ class LocalesLoader {
   constructor(lang, SSR) {
     this.locales = undefined;
     this.observers = [];
+    const localeCode = localesPaths[lang] ? lang : 'es-AR';
     if (SSR) {
-      console.log('ssr');
-      const json = require(`./locales/${lang}.json`);
+      const json = require(`./locales/${localeCode}.json`);
       this.locales = json;
       this.observers.map(observer => observer(json));
     } else {
-      localesPaths[lang]((json) => {
+      localesPaths[localeCode]((json) => {
         this.locales = json;
         this.observers.map(observer => observer(json));
       });
@@ -96,7 +96,7 @@ class LocalesLoader {
 }
 
 module.exports = {
-  install: (Vue, { lang, SSR } = {}) => {
+  install: (Vue, { lang, SSR }) => {
     const localesLoader = new LocalesLoader(lang, SSR);
     Vue.mixin({
       data: () => ({
