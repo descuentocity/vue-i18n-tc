@@ -1,3 +1,5 @@
+'use strict';
+
 /* eslint-disable global-require, import/no-dynamic-require, no-underscore-dangle */
 function getLocale(locales, key = '') {
   const locale = locales[key];
@@ -58,16 +60,16 @@ function __(locales, key, params, qty) {
 }
 
 const localesPaths = {
-  'es-AR': cb => require(['json-loader!./locales/es-AR.json'], cb),
-  'en-US': cb => require(['json-loader!./locales/en-US.json'], cb),
-  'es-CL': cb => require(['json-loader!./locales/es-CL.json'], cb),
-  'es-CO': cb => require(['json-loader!./locales/es-CO.json'], cb),
-  'es-ES': cb => require(['json-loader!./locales/es-ES.json'], cb),
-  'es-MX': cb => require(['json-loader!./locales/es-MX.json'], cb),
-  'es-PE': cb => require(['json-loader!./locales/es-PE.json'], cb),
-  'es-UY': cb => require(['json-loader!./locales/es-UY.json'], cb),
-  'es-VE': cb => require(['json-loader!./locales/es-VE.json'], cb),
-  'pt-BR': cb => require(['json-loader!./locales/pt-BR.json'], cb),
+  'es-AR': cb => require(['json-loader!../locales/es-AR.json'], cb),
+  'en-US': cb => require(['json-loader!../locales/en-US.json'], cb),
+  'es-CL': cb => require(['json-loader!../locales/es-CL.json'], cb),
+  'es-CO': cb => require(['json-loader!../locales/es-CO.json'], cb),
+  'es-ES': cb => require(['json-loader!../locales/es-ES.json'], cb),
+  'es-MX': cb => require(['json-loader!../locales/es-MX.json'], cb),
+  'es-PE': cb => require(['json-loader!../locales/es-PE.json'], cb),
+  'es-UY': cb => require(['json-loader!../locales/es-UY.json'], cb),
+  'es-VE': cb => require(['json-loader!../locales/es-VE.json'], cb),
+  'pt-BR': cb => require(['json-loader!../locales/pt-BR.json'], cb),
 };
 
 class LocalesLoader {
@@ -76,7 +78,7 @@ class LocalesLoader {
     this.observers = [];
     const localeCode = localesPaths[lang] ? lang : 'es-AR';
     if (SSR) {
-      const json = require(`./locales/${localeCode}.json`);
+      const json = require(`../locales/${localeCode}.json`);
       this.locales = json;
       this.observers.map(observer => observer(json));
     } else {
