@@ -10,7 +10,8 @@ class LocalesLoader {
       this.locales[lang] = json;
       this.observers[lang].map(observer => observer(json));
     } else {
-      ajax('GET', path).promise.then((json) => {
+      console.log('get', path);
+      ajax({ path }).promise.then((json) => {
         this.locales[lang] = json;
         this.observers[lang].map(observer => observer(json));
       }).catch((error) => {
@@ -19,11 +20,13 @@ class LocalesLoader {
     }
   }
   subscribe(lang, observer) {
+    console.log(lang);
     if (this.locales[lang]) {
       observer(this.locales[lang]);
       return;
     }
-    this.observers[lang] = (this.observers[lang] || []).push(observer);
+    this.observers[lang] = (this.observers[lang] || []);
+    this.observers[lang].push(observer);
   }
 }
 

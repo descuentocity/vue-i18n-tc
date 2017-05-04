@@ -1,12 +1,7 @@
 /* global XMLHttpRequest */
-export default function ({
-  url,
-  method = 'GET',
-  data,
-  form = false,
-}) {
+export default function ({ path, method = 'GET' }) {
   const xhr = new XMLHttpRequest();
-  xhr.open(method, url, true);
+  xhr.open(method, path, true);
   let cancelPromise = () => {};
   const ret = {
     promise: new Promise((resolve, reject) => {
@@ -31,24 +26,6 @@ export default function ({
     }),
   };
   ret.cancel = cancelPromise;
-  // TODO: HAY QUE HACER REFACTOR A ESTO
-  if (method === 'POST') {
-    if (typeof data === 'object') {
-      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      if (form) {
-        // JSON as form
-        xhr.send(Object.keys(data).map(key => `${key}=${data[key]}`).join('&'));
-      } else {
-        // RAW JSON
-        xhr.send(JSON.stringify(data));
-      }
-    } else {
-      // ROW DATA
-      xhr.send(data);
-    }
-  } else {
-    // GET
-    xhr.send();
-  }
+  xhr.send();
   return ret;
 }
