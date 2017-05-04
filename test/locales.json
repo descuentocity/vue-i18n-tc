@@ -1,0 +1,8 @@
+{
+  "simple string": "simple translated string",
+  "pluralization": "singular|plural",
+  "interpolation {args1} {args2}": "interpolated translated string {args1} {args2}",
+  "interpolation and pluralization {args1} {args2}": "interpolated and pluralizated string - singular {args1} {args2}|interpolated and pluralizated string - plural {args1} {args2}",
+  "array interpolation ?, ?": "array interpolated string ?, ?",
+  "array interpolation and pluralization ? ?": "array interplated and pluralizated string singular ? ?|array interplated and pluralizated string plural ? ?"
+}
