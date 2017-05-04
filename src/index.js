@@ -2,25 +2,32 @@ import localize from './lib/localize';
 import ajax from './lib/ajax';
 
 class LocalesLoader {
-  constructor({ lang, SSR, path }) {
+  constructor({ lang, SSR, path, get }) {
     this.locales = {};
     this.observers = {};
-    if (SSR) {
-      const json = require(path);
-      this.locales[lang] = json;
-      this.observers[lang].map(observer => observer(json));
-    } else {
-      console.log('get', path);
-      ajax({ path }).promise.then((json) => {
+    if (get) {
+      get().then((json) => {
         this.locales[lang] = json;
         this.observers[lang].map(observer => observer(json));
       }).catch((error) => {
         console.error(error);
       });
+      return;
     }
+    if (SSR) {
+      const json = require(path);
+      this.locales[lang] = json;
+      this.observers[lang].map(observer => observer(json));
+      return;
+    }
+    ajax({ path }).promise.then((json) => {
+      this.locales[lang] = json;
+      this.observers[lang].map(observer => observer(json));
+    }).catch((error) => {
+      console.error(error);
+    });
   }
   subscribe(lang, observer) {
-    console.log(lang);
     if (this.locales[lang]) {
       observer(this.locales[lang]);
       return;
@@ -31,8 +38,8 @@ class LocalesLoader {
 }
 
 module.exports = {
-  install: (Vue, { lang, SSR, path }) => {
-    const localesLoader = new LocalesLoader({ lang, SSR, path });
+  install: (Vue, { lang, SSR, path, get }) => {
+    const localesLoader = new LocalesLoader({ lang, SSR, path, get });
     Vue.mixin({
       data: () => ({
         lang,
