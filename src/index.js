@@ -2,9 +2,13 @@ import localize from './lib/localize';
 import ajax from './lib/ajax';
 
 class LocalesLoader {
-  constructor({ lang, SSR, path, get }) {
+  constructor({ lang, SSR, path, get, locales }) {
     this.locales = {};
     this.observers = {};
+    if (locales) {
+      this.locales = locales;
+      return;
+    }
     if (get) {
       get().then((json) => {
         this.locales[lang] = json;
@@ -37,17 +41,17 @@ class LocalesLoader {
   }
 }
 
-module.exports = {
-  install: (Vue, { lang, SSR, path, get }) => {
-    const localesLoader = new LocalesLoader({ lang, SSR, path, get });
+export default {
+  install: (Vue, { lang, SSR, path, get, locales }) => {
+    const localesLoader = new LocalesLoader({ lang, SSR, path, get, locales });
     Vue.mixin({
       data: () => ({
         lang,
         locales: {},
       }),
       created() {
-        localesLoader.subscribe(lang, (locales) => {
-          this.locales = locales;
+        localesLoader.subscribe(lang, (localesJson) => {
+          this.locales = localesJson;
         });
       },
       methods: {
