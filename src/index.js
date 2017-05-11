@@ -1,7 +1,7 @@
 import localize from './lib/localize';
 import ajax from './lib/ajax';
 
-function getLocales({ SSR, path, get }) {
+function getLocales({ path, get }) {
   return new Promise((resolve) => {
     if (get) {
       get().then((json) => {
@@ -10,11 +10,6 @@ function getLocales({ SSR, path, get }) {
         console.error(error);
         resolve({});
       });
-      return;
-    }
-    if (SSR) {
-      const json = require(path);
-      resolve(json);
       return;
     }
     ajax({ path }).promise.then((json) => {
@@ -30,7 +25,7 @@ class LocalesLoader {
   constructor({ SSR, path, get, locales }) {
     this.locales = undefined;
     this.observers = [];
-    getLocales({ SSR, path, get, locales }).then((localesJson) => {
+    getLocales({ path, get, locales }).then((localesJson) => {
       this.locales = localesJson;
       this.observers.map(observer => observer(localesJson));
     }).catch((error) => {
