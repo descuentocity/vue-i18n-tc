@@ -22,7 +22,7 @@ function getLocales({ path, get }) {
 }
 
 class LocalesLoader {
-  constructor({ SSR, path, get, locales }) {
+  constructor({ path, get, locales }) {
     this.locales = undefined;
     this.observers = [];
     getLocales({ path, get, locales }).then((localesJson) => {
