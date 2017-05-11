@@ -49,7 +49,7 @@ class LocalesLoader {
 
 export default {
   install: (Vue, { lang, SSR, path, get, locales }) => {
-    if ((SSR && locales) || locales) {
+    if (locales) {
       Vue.mixin({
         data: () => ({
           lang,
