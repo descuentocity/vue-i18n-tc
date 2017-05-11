@@ -22,10 +22,10 @@ function getLocales({ path, get }) {
 }
 
 class LocalesLoader {
-  constructor({ path, get, locales }) {
+  constructor({ path, get }) {
     this.locales = undefined;
     this.observers = [];
-    getLocales({ path, get, locales }).then((localesJson) => {
+    getLocales({ path, get }).then((localesJson) => {
       this.locales = localesJson;
       this.observers.map(observer => observer(localesJson));
     }).catch((error) => {
@@ -43,7 +43,7 @@ class LocalesLoader {
 }
 
 export default {
-  install: (Vue, { lang, SSR, path, get, locales }) => {
+  install: (Vue, { lang, path, get, locales }) => {
     if (locales) {
       Vue.mixin({
         data: () => ({
@@ -58,7 +58,7 @@ export default {
       });
       return;
     }
-    const localesLoader = new LocalesLoader({ lang, SSR, path, get });
+    const localesLoader = new LocalesLoader({ path, get });
     Vue.mixin({
       data: () => ({
         lang,
