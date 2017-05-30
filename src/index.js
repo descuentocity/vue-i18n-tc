@@ -1,83 +1,18 @@
 import localize from './lib/localize';
-import ajax from './lib/ajax';
 
-function getLocales({ path, get }) {
-  return new Promise((resolve) => {
-    if (get) {
-      get().then((json) => {
-        resolve(json);
-      }).catch((error) => {
-        console.error(error);
-        resolve({});
-      });
-      return;
-    }
-    ajax({ path }).promise.then((json) => {
-      resolve(json);
-    }).catch((error) => {
-      console.error(error);
-      resolve({});
-    });
-  });
-}
+let LOCALES = {};
 
-class LocalesLoader {
-  constructor({ path, get }) {
-    this.locales = undefined;
-    this.observers = [];
-    getLocales({ path, get }).then((localesJson) => {
-      this.locales = localesJson;
-      this.observers.map(observer => observer(localesJson));
-    }).catch((error) => {
-      console.error(error);
-    });
-  }
-  subscribe(observer) {
-    if (this.locales) {
-      observer(this.locales);
-      return;
-    }
-    this.observers = (this.observers || []);
-    this.observers.push(observer);
-  }
-}
-
-export default class Plugin {
-  constructor({ lang, path, get, locales }) {
-    return {
-      install: (Vue) => {
-        if (locales) {
-          Vue.mixin({
-            data: () => ({
-              lang,
-              locales,
-            }),
-            methods: {
-              __(...args) {
-                return localize(this.locales, ...args);
-              },
-            },
-          });
-          return;
-        }
-        const localesLoader = new LocalesLoader({ path, get });
-        Vue.mixin({
-          data: () => ({
-            lang,
-            locales: {},
-          }),
-          created() {
-            localesLoader.subscribe((localesJson) => {
-              this.locales = localesJson;
-            });
-          },
-          methods: {
-            __(...args) {
-              return localize(this.locales, ...args);
-            },
-          },
-        });
+export default {
+  install: (Vue) => {
+    Vue.mixin({
+      methods: {
+        __(...args) {
+          return localize(LOCALES, ...args);
+        },
+        setLocales(_locales) {
+          LOCALES = _locales;
+        },
       },
-    };
-  }
-}
+    });
+  },
+};
