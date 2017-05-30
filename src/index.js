@@ -42,38 +42,42 @@ class LocalesLoader {
   }
 }
 
-export default {
-  install: (Vue, { lang, path, get, locales }) => {
-    if (locales) {
-      Vue.mixin({
-        data: () => ({
-          lang,
-          locales,
-        }),
-        methods: {
-          __(...args) {
-            return localize(this.locales, ...args);
+export default class Plugin {
+  constructor({ lang, path, get, locales }) {
+    return {
+      install: (Vue) => {
+        if (locales) {
+          Vue.mixin({
+            data: () => ({
+              lang,
+              locales,
+            }),
+            methods: {
+              __(...args) {
+                return localize(this.locales, ...args);
+              },
+            },
+          });
+          return;
+        }
+        const localesLoader = new LocalesLoader({ path, get });
+        Vue.mixin({
+          data: () => ({
+            lang,
+            locales: {},
+          }),
+          created() {
+            localesLoader.subscribe((localesJson) => {
+              this.locales = localesJson;
+            });
           },
-        },
-      });
-      return;
-    }
-    const localesLoader = new LocalesLoader({ path, get });
-    Vue.mixin({
-      data: () => ({
-        lang,
-        locales: {},
-      }),
-      created() {
-        localesLoader.subscribe((localesJson) => {
-          this.locales = localesJson;
+          methods: {
+            __(...args) {
+              return localize(this.locales, ...args);
+            },
+          },
         });
       },
-      methods: {
-        __(...args) {
-          return localize(this.locales, ...args);
-        },
-      },
-    });
-  },
-};
+    };
+  }
+}
